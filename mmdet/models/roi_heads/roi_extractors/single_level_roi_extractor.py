@@ -73,7 +73,10 @@ class SingleRoIExtractor(BaseRoIExtractor):
         if num_levels == 1:
             if len(rois) == 0:
                 return roi_feats
-            return self.roi_layers[0](feats[0], rois)
+            #lzy code for stable random seed on 2024.2.23
+            # return self.roi_layers[0](feats[0], rois)
+            print('seed--------------------')
+            return self.roi_layers[0](feats[0].half().double(), rois.half().double()).to(rois.dtype)
 
         target_lvls = self.map_roi_levels(rois, num_levels)
 

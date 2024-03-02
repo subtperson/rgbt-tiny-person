@@ -44,6 +44,7 @@ class GenericRoIExtractor(BaseRoIExtractor):
     def forward(self, feats, rois, roi_scale_factor=None):
         """Forward function."""
         if len(feats) == 1:
+            print('Using single level extractor----------------------')
             return self.roi_layers[0](feats[0], rois)
 
         out_size = self.roi_layers[0].output_size

@@ -54,7 +54,7 @@ def parse_args():
         default=0,
         help='id of gpu to use '
         '(only applicable to non-distributed training)')
-    parser.add_argument('--seed', type=int, default=None, help='random seed')
+    parser.add_argument('--seed', type=int, default=418, help='random seed')
     parser.add_argument(
         '--diff-seed',
         action='store_true',
@@ -90,6 +90,7 @@ def parse_args():
         '--auto-scale-lr',
         action='store_true',
         help='enable automatically scaling LR.')
+    parser.add_argument('--extra', type=str, default=None, help='extra tag for the exp')
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -109,7 +110,8 @@ def main():
     args = parse_args()
 
     cfg = Config.fromfile(args.config)
-    cfg.work_dir = cfg.work_dir + time.strftime('/%Y%m%d_%H%M%S', time.localtime())
+    extra_tag = args.extra
+    cfg.work_dir = cfg.work_dir + time.strftime('/%Y%m%d_%H%M%S-'+ extra_tag, time.localtime()) if extra_tag else cfg.work_dir + time.strftime('/%Y%m%d_%H%M%S', time.localtime())
 
     # replace the ${key} with the value of cfg.key
     cfg = replace_cfg_vals(cfg)
