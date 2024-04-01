@@ -54,7 +54,7 @@ def parse_args():
         default=0,
         help='id of gpu to use '
         '(only applicable to non-distributed training)')
-    parser.add_argument('--seed', type=int, default=418, help='random seed')
+    parser.add_argument('--seed', type=int, default=None, help='random seed')
     parser.add_argument(
         '--diff-seed',
         action='store_true',
@@ -236,6 +236,7 @@ def main():
             CLASSES=datasets[0].CLASSES)
     # add an attribute for visualization convenience
     model.CLASSES = datasets[0].CLASSES
+    os.system('cp /media/vision/lzy/mm_person/mmdet-rgbtdroneperson/mmdet/models/detectors/qfdet.py ' + cfg.work_dir)
     train_detector(
         model,
         datasets,

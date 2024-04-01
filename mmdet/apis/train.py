@@ -65,8 +65,6 @@ def set_random_seed(seed, deterministic=False):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed) 
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
     print('seed', str(seed))
 
     # os.environ["CUBLAS_WORKSPACE_CONFIG"]=":4096:8"
@@ -75,9 +73,9 @@ def set_random_seed(seed, deterministic=False):
     # np.random.seed(seed)
     # torch.manual_seed(seed)
     # torch.cuda.manual_seed_all(seed)
-    # if deterministic:
-    #     torch.backends.cudnn.deterministic = True
-    #     torch.backends.cudnn.benchmark = False
+    if deterministic:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
 
 def auto_scale_lr(cfg, distributed, logger):

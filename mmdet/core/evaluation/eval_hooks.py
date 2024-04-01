@@ -61,6 +61,31 @@ class EvalHook(BaseEvalHook):
         self.latest_results = results
         runner.log_buffer.output['eval_iter_num'] = len(self.dataloader)
         key_score = self.evaluate(runner, results)
+
+        if runner.epoch == 0:
+            runner.maxmap = 0
+        elif runner.log_buffer.output['bbox_mAP_50'] > runner.maxmap:
+            runner.maxmap_dict = runner.log_buffer.output.copy()
+            runner.maxmap = runner.log_buffer.output['bbox_mAP_50']
+        
+
+        if runner.epoch == runner.max_epochs-1:
+            dir = str(runner.work_dir)
+            # rename dir
+            newdir = dir + '-%.4f-%.4f-%.4f-%.4f-%.4f-%.4f-%.4f' % (
+                runner.maxmap_dict['bbox_mAP_50'],
+                runner.maxmap_dict['bbox_mAP_50_tiny'],
+                runner.maxmap_dict['bbox_mAP_50_tiny1'],
+                runner.maxmap_dict['bbox_mAP_50_tiny2'],
+                runner.maxmap_dict['bbox_mAP_50_tiny3'],
+                runner.maxmap_dict['bbox_mAP_50_small'],
+                runner.maxmap_dict['bbox_mAP_25'],
+            )
+            import os
+            os.rename(dir, newdir)
+            runner.work_dir = newdir
+
+
         # the key_score may be `None` so it needs to skip the action to save
         # the best checkpoint
         if self.save_best and key_score:

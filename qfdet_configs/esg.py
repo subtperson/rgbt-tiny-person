@@ -77,7 +77,8 @@ model = dict(
     base_fusion='cat',
     quality_attention=True,
     poolupsample=1,
-    # chuangxin1=True,
+    # lzystn=True,
+    esg=True,
     # reweight=True,
     # training and testing settings
     train_cfg=dict(
@@ -154,4 +155,4 @@ evaluation = dict(interval=1, metric='bbox')
 optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(_delete_=True, max_norm=35, norm_type=2))
 
-work_dir = 'work_dir/qfdet_star_r50_fpn/rgbtdroneperson'
+work_dir = 'work_dir/esg'
