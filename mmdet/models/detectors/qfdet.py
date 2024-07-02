@@ -185,7 +185,7 @@ class QFDet(SingleStageDetector):
             #     cv2.imwrite('/media/vision/lzy/mm_person/mmdet-rgbtdroneperson/vis/'+ '2-4.png', map0[0, 0, :, :].detach().cpu().numpy()*255)
 
             wei = 0.1
-            lossesg = (lossesg0 + lossesg1 + lossesg2 + lossesg3 + lossesg4) * wei
+            lossesg = (lossesg0 + lossesg1 + lossesg2 ) * wei
 
             losses.update({'esg': lossesg})
 

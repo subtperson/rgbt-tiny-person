@@ -4,6 +4,7 @@ import pickle
 import shutil
 import tempfile
 import time
+import cv2  
 
 import mmcv
 import torch
@@ -12,6 +13,7 @@ from mmcv.image import tensor2imgs
 from mmcv.runner import get_dist_info
 
 from mmdet.core import encode_mask_results
+
 
 
 def single_gpu_test(model,
@@ -29,36 +31,41 @@ def single_gpu_test(model,
             result = model(return_loss=False, rescale=True, **data)
 
         batch_size = len(result)
+        # print(batch_size,"+++++++++++++++")
         if show or out_dir:
-            if batch_size == 1 and isinstance(data['img'][0], torch.Tensor):
-                img_tensor = data['img'][0]
+            # if batch_size == 1 :
+            #     img_tensor = data['img'][0][0].data[0]
+            #     # filename = data['img_metas'][0].data[0]['filename']
+            #     # img_tensor = 
+            # else:
+            #     img_tensor = data['img'][0].data[0]
+            img_meta = data['img_metas'][0].data[0][0]
+            # imgs = tensor2imgs(img_tensor, **img_metas['img_norm_cfg'])
+            # assert len(imgs) == len(img_metas)
+            filename = img_meta['filename'][1]
+            img = cv2.imread(filename)
+
+            # for i, (img, img_meta) in enumerate(zip(imgs, img_metas)):
+            h, w, _ = img_meta['img_shape']
+            img_show = img[:h, :w, :]
+
+            ori_h, ori_w = img_meta['ori_shape'][:-1]
+            img_show = mmcv.imresize(img_show, (ori_w, ori_h))
+
+            if out_dir:
+                out_file = osp.join(out_dir, img_meta['ori_filename'])
             else:
-                img_tensor = data['img'][0].data[0]
-            img_metas = data['img_metas'][0].data[0]
-            imgs = tensor2imgs(img_tensor, **img_metas[0]['img_norm_cfg'])
-            assert len(imgs) == len(img_metas)
+                out_file = None
 
-            for i, (img, img_meta) in enumerate(zip(imgs, img_metas)):
-                h, w, _ = img_meta['img_shape']
-                img_show = img[:h, :w, :]
-
-                ori_h, ori_w = img_meta['ori_shape'][:-1]
-                img_show = mmcv.imresize(img_show, (ori_w, ori_h))
-
-                if out_dir:
-                    out_file = osp.join(out_dir, img_meta['ori_filename'])
-                else:
-                    out_file = None
-
-                model.module.show_result(
-                    img_show,
-                    result[i],
-                    bbox_color=PALETTE,
-                    text_color=PALETTE,
-                    mask_color=PALETTE,
-                    show=show,
-                    out_file=out_file,
-                    score_thr=show_score_thr)
+            model.module.show_result(
+                img_show,
+                result[0],
+                bbox_color=PALETTE,
+                text_color=PALETTE,
+                mask_color=PALETTE,
+                show=show,
+                out_file=out_file,
+                score_thr=show_score_thr)
 
         # encode mask results
         if isinstance(result[0], tuple):
